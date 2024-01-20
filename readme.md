@@ -131,9 +131,9 @@ on other servers will become active immediately without data loss and service in
 
 ![replication](doc/images/replication.png)
 
-## Built-in Docker/NPM/Maven Registry (Enterprise Edition)
+## Built-in Docker/NPM/Maven/NuGET/PyPi/RubyGems Registry (Enterprise Edition)
 
-The out-of-box integration of packages (supports docker/npm/maven/nuget currently, more to come), CI/CD,
+The out-of-box integration of binary packages, CI/CD,
 code and issues makes information cross-reference a lot easier. For instance, different package
 versions can be compared to show code changes or fixed issues, published packages will be linked
 with CI/CD builds automatically etc
