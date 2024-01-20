@@ -16,12 +16,14 @@ import io.onedev.server.ee.dashboard.widgets.WidgetGroup;
 import io.onedev.server.ee.pack.container.ContainerAuthenticationFilter;
 import io.onedev.server.ee.pack.container.ContainerPackSupport;
 import io.onedev.server.ee.pack.container.ContainerServlet;
-import io.onedev.server.ee.pack.maven.MavenPackSupport;
+import io.onedev.server.ee.pack.gem.GemPackService;
+import io.onedev.server.ee.pack.gem.GemPackSupport;
 import io.onedev.server.ee.pack.maven.MavenPackService;
-import io.onedev.server.ee.pack.npm.NpmPackSupport;
+import io.onedev.server.ee.pack.maven.MavenPackSupport;
 import io.onedev.server.ee.pack.npm.NpmPackService;
-import io.onedev.server.ee.pack.nuget.NugetPackSupport;
+import io.onedev.server.ee.pack.npm.NpmPackSupport;
 import io.onedev.server.ee.pack.nuget.NugetPackService;
+import io.onedev.server.ee.pack.nuget.NugetPackSupport;
 import io.onedev.server.ee.pack.pypi.PypiPackService;
 import io.onedev.server.ee.pack.pypi.PypiPackSupport;
 import io.onedev.server.ee.sendgrid.DefaultMessageManager;
@@ -178,6 +180,10 @@ public class EEModule extends AbstractPluginModule {
 		bind(PypiPackService.class);
 		contribute(PackService.class, PypiPackService.class);
 		contribute(PackSupport.class, new PypiPackSupport());
+
+		bind(GemPackService.class);
+		contribute(PackService.class, GemPackService.class);
+		contribute(PackSupport.class, new GemPackSupport());
 	}
 
 	@Override

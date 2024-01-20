@@ -260,6 +260,7 @@ public class NugetPackService implements PackService {
 									pack.setName(name);
 									pack.setVersion(version);
 									pack.setProject(project);
+									pack.setPrerelease(version.contains("-"));
 
 									if (buildId != null)
 										pack.setBuild(buildManager.load(buildId));
@@ -357,18 +358,14 @@ public class NugetPackService implements PackService {
 				if (StringUtils.isNotBlank(take))
 					count = Math.min(Integer.parseInt(take), MAX_QUERY_COUNT);
 				
-				String excludeVersionQuery;
-				if ("true".equals(request.getParameter("prerelease")))
-					excludeVersionQuery = null;
-				else 
-					excludeVersionQuery = "-";
+				boolean includePrerelease = "true".equals(request.getParameter("prerelease"));
 				
 				var project = checkProject(projectId, false);
-				var totalHits = packManager.countNames(project, TYPE, nameQuery, excludeVersionQuery);
-				var names = packManager.queryNames(project, TYPE, nameQuery, excludeVersionQuery, offset, count);
+				var totalHits = packManager.countNames(project, TYPE, nameQuery, includePrerelease);
+				var names = packManager.queryNames(project, TYPE, nameQuery, includePrerelease, offset, count);
 				Map<String, List<Pack>> packs;
 				if (!names.isEmpty()) 
-					packs = packManager.loadPacks(names, excludeVersionQuery, VERSION_COMPARATOR);
+					packs = packManager.loadPacks(names, includePrerelease, VERSION_COMPARATOR);
 				else 
 					packs = new LinkedHashMap<>();
 

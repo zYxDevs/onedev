@@ -37,19 +37,22 @@ public interface PackManager extends EntityManager<Pack> {
 	Pack findByGWithoutAV(Project project, String type, String groupId);
 
 	List<Pack> queryByGAWithV(Project project, String type, String groupId, String artifactId);
+
+	List<Pack> query(Project project, String type, @Nullable Boolean prerelease);
 	
 	List<Pack> queryByName(Project project, String type, String name, 
 						   @Nullable Comparator<Pack> sortComparator);
 	
-	List<Pack> queryLatests(Project project, String type, String nameQuery, int firstResult, int maxResults);
+	List<Pack> queryLatests(Project project, String type, @Nullable String nameQuery, 
+							boolean includePrerelease, int firstResult, int maxResults);
 
 	int countNames(Project project, String type, @Nullable String nameQuery, 
-				   @Nullable String excludeVersionQuery);
+				   boolean includePrerelease);
 
 	List<String> queryNames(Project project, String type, @Nullable String nameQuery, 
-							@Nullable String excludeVersionQuery, int firstResult, int maxResults);
+							boolean includePrerelease, int firstResult, int maxResults);
 	
-	Map<String, List<Pack>> loadPacks(List<String> names, @Nullable String exludeVersionQuery, 
+	Map<String, List<Pack>> loadPacks(List<String> names, boolean includePrerelease, 
 									  @Nullable Comparator<Pack> sortComparator);
 	
 	@Nullable

@@ -41,8 +41,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import java.io.*;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
 import java.util.Date;
 import java.util.UUID;
 
@@ -56,7 +54,6 @@ import static io.onedev.server.model.Project.PROP_PENDING_DELETE;
 import static io.onedev.server.util.Digest.SHA256;
 import static io.onedev.server.util.IOUtils.BUFFER_SIZE;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
-import static org.apache.commons.codec.binary.Hex.encodeHexString;
 import static org.apache.commons.io.IOUtils.copy;
 
 @Singleton
@@ -328,9 +325,9 @@ public class DefaultPackBlobManager extends BaseEntityManager<PackBlob>
 			projectManager.runOnActiveServer(projectId, () -> {
 				var uploadFile = getUploadFile(projectId, uuid);
 				if (blobCreateResult.getRight()) {
-					var blobFile = getPackBlobFile(projectId, sha256Hash);
+					var blobFile = getPackBlobFile(projectId, fileUploadResult.getRight());
 					FileUtils.createDir(blobFile.getParentFile());
-					write(getFileLockName(projectId, sha256Hash), () -> {
+					write(getFileLockName(projectId, fileUploadResult.getRight()), () -> {
 						if (blobFile.exists())
 							FileUtils.deleteFile(blobFile);
 						FileUtils.moveFile(uploadFile, blobFile);

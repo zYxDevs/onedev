@@ -45,6 +45,8 @@ public class Pack extends AbstractEntity implements LabelSupport<PackLabel> {
 
 	public static final String PROP_ARTIFACT_ID = "artifactId";
 
+	public static final String PROP_PRERELEASE = "prerelease";
+	
 	public static final String NAME_ID = "Id";
 	
 	public static final String NAME_NAME = "Name";
@@ -92,6 +94,8 @@ public class Pack extends AbstractEntity implements LabelSupport<PackLabel> {
 	private String artifactId;
 	
 	private String version;
+	
+	private boolean prerelease;
 	
 	private String name;
 
@@ -167,6 +171,14 @@ public class Pack extends AbstractEntity implements LabelSupport<PackLabel> {
 
 	public void setVersion(@Nullable String version) {
 		this.version = version;
+	}
+
+	public boolean isPrerelease() {
+		return prerelease;
+	}
+
+	public void setPrerelease(boolean prerelease) {
+		this.prerelease = prerelease;
 	}
 
 	public String getGAV() {

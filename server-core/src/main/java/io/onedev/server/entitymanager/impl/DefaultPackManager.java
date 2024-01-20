@@ -327,15 +327,39 @@ public class DefaultPackManager extends BaseEntityManager<Pack>
 
 	@Sessional
 	@Override
+	public List<Pack> query(Project project, String type, Boolean includePrerelease) {
+		var criteria = newCriteria();
+		criteria.add(Restrictions.eq(PROP_PROJECT, project));
+		criteria.add(Restrictions.eq(PROP_TYPE, type));
+		if (includePrerelease != null)
+			criteria.add(Restrictions.eq(PROP_PRERELEASE, includePrerelease));
+		criteria.addOrder(org.hibernate.criterion.Order.asc(PROP_ID));
+		return query(criteria);
+	}
+	
+	@Sessional
+	@Override
 	public List<Pack> queryLatests(Project project, String type, String nameQuery,
-								   int firstResult, int maxResults) {
-		Query<Pack> query = getSession().createQuery("" +
+								   boolean includePrerelease, int firstResult, int maxResults) {
+		var queryString = "" +
 				"select p1 from Pack p1 " +
 				"left outer join Pack p2 " +
-				"	on p1.name = p2.name and p1.id < p2.id " +
-				"where p2.id is null and lower(p1.name) like :name " +
-				"order by p1.name");
-		query.setParameter("name", "%" + nameQuery + "%");
+				"	on p1.name = p2.name and p1.id < p2.id";
+		if (!includePrerelease)
+			queryString += " and p2.prerelease = false";
+		queryString += " where p2.id is null";
+		
+		if (nameQuery != null) 
+			queryString += " and lower(p1.name) like :name";		
+		if (!includePrerelease)
+			queryString += " and p1.prerelease = false";
+		
+		queryString += " order by p1.name";
+
+		Query<Pack> query = getSession().createQuery(queryString);
+		if (nameQuery != null)
+			query.setParameter("name", "%" + nameQuery + "%");
+		
 		query.setFirstResult(firstResult);
 		query.setMaxResults(maxResults);
 		return query.list();
@@ -343,7 +367,7 @@ public class DefaultPackManager extends BaseEntityManager<Pack>
 
 	@Sessional
 	@Override
-	public int countNames(Project project, String type, String nameQuery, String excludeVersionQuery) {
+	public int countNames(Project project, String type, String nameQuery, boolean includePrerelease) {
 		CriteriaBuilder builder = getSession().getCriteriaBuilder();
 		CriteriaQuery<Long> criteriaQuery = builder.createQuery(Long.class);
 		Root<Pack> root = criteriaQuery.from(Pack.class);
@@ -352,8 +376,8 @@ public class DefaultPackManager extends BaseEntityManager<Pack>
 		var predicates = new ArrayList<Predicate>();
 		if (nameQuery != null)
 			predicates.add(builder.like(builder.lower(root.get(PROP_NAME)), "%" + nameQuery.toLowerCase() + "%"));
-		if (excludeVersionQuery != null)
-			predicates.add(builder.notLike(builder.lower(root.get(PROP_VERSION)), "%" + excludeVersionQuery + "%"));
+		if (!includePrerelease)
+			predicates.add(builder.equal(root.get(PROP_PRERELEASE), false));
 		
 		if (!predicates.isEmpty())
 			criteriaQuery.where(predicates.toArray(new Predicate[0]));
@@ -363,8 +387,8 @@ public class DefaultPackManager extends BaseEntityManager<Pack>
 
 	@Sessional
 	@Override
-	public List<String> queryNames(Project project, String type, String nameQuery, String excludeVersionQuery, 
-								   int firstResult, int maxResults) {
+	public List<String> queryNames(Project project, String type, String nameQuery, 
+								   boolean includePrerelease, int firstResult, int maxResults) {
 		CriteriaBuilder builder = getSession().getCriteriaBuilder();
 		CriteriaQuery<String> criteriaQuery = builder.createQuery(String.class);
 		Root<Pack> root = criteriaQuery.from(Pack.class);
@@ -373,8 +397,8 @@ public class DefaultPackManager extends BaseEntityManager<Pack>
 		var predicates = new ArrayList<Predicate>();
 		if (nameQuery != null)
 			predicates.add(builder.like(builder.lower(root.get(PROP_NAME)), "%" + nameQuery.toLowerCase() + "%"));
-		if (excludeVersionQuery != null)
-			predicates.add(builder.notLike(builder.lower(root.get(PROP_VERSION)), "%" + excludeVersionQuery + "%"));
+		if (!includePrerelease)
+			predicates.add(builder.equal(root.get(PROP_PRERELEASE), false));
 
 		if (!predicates.isEmpty())
 			criteriaQuery.where(predicates.toArray(new Predicate[0]));
@@ -387,7 +411,7 @@ public class DefaultPackManager extends BaseEntityManager<Pack>
 	
 	@Sessional
 	@Override
-	public Map<String, List<Pack>> loadPacks(List<String> names, String exludeVersionQuery, 
+	public Map<String, List<Pack>> loadPacks(List<String> names, boolean includePrerelease, 
 											 Comparator<Pack> sortComparator) {
 		CriteriaBuilder builder = getSession().getCriteriaBuilder();
 		CriteriaQuery<Pack> criteriaQuery = builder.createQuery(Pack.class);
@@ -395,8 +419,8 @@ public class DefaultPackManager extends BaseEntityManager<Pack>
 		criteriaQuery.select(root);
 
 		var predicates = Lists.newArrayList(root.get(PROP_NAME).in(names));
-		if (exludeVersionQuery != null)
-			predicates.add(builder.notLike(builder.lower(root.get(PROP_VERSION)), "%" + exludeVersionQuery + "%"));
+		if (!includePrerelease)
+			predicates.add(builder.equal(root.get(PROP_PRERELEASE), false));
 		criteriaQuery.where(predicates.toArray(new Predicate[0]));
 		if (sortComparator == null)
 			criteriaQuery.orderBy(builder.asc(root.get(PROP_ID)));

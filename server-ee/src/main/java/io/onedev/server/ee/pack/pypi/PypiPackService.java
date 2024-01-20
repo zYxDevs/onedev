@@ -211,7 +211,7 @@ public class PypiPackService implements PackService {
 				if (pathSegments.isEmpty()) {
 					sessionManager.run(() -> {
 						var project = checkProject(projectId, false);
-						var names = packManager.queryNames(project, TYPE, null, null, 0, MAX_VALUE);
+						var names = packManager.queryNames(project, TYPE, null, true, 0, MAX_VALUE);
 						var bindings = new HashMap<String, Object>();
 						bindings.put("names", names);
 						try {

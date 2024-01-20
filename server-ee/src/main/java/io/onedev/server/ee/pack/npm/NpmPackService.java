@@ -233,7 +233,7 @@ public class NpmPackService implements PackService {
 					sessionManager.run(() -> {
 						var project = checkProject(projectId, false);
 						var objectsNode = objectMapper.createArrayNode();
-						for (var pack: packManager.queryLatests(project, TYPE, query, offset, count)) {
+						for (var pack: packManager.queryLatests(project, TYPE, query, true, offset, count)) {
 							var packNode = objectMapper.createObjectNode();
 							var packData = (NpmData) pack.getData();								
 							var metadata = readJson(packData.getMetadata());

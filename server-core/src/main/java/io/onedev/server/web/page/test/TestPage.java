@@ -1,8 +1,5 @@
 package io.onedev.server.web.page.test;
 
-import io.onedev.server.OneDev;
-import io.onedev.server.entitymanager.PackManager;
-import io.onedev.server.entitymanager.ProjectManager;
 import io.onedev.server.web.page.base.BasePage;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
@@ -24,11 +21,6 @@ public class TestPage extends BasePage {
 
 			@Override
 			public void onClick() {
-				var project = OneDev.getInstance(ProjectManager.class).load(1L);
-				System.out.println("************************");
-				for (var pack: OneDev.getInstance(PackManager.class).queryLatests(project, "npm", "mylib", 0, 100)) {
-					System.out.println(pack.getName() + "@" + pack.getVersion());
-				}
 			}
 			
 		});
